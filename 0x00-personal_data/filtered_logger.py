@@ -4,12 +4,13 @@ import logging
 import re
 import os
 import mysql.connector
-import bcrypt
 from typing import List
 
 
 def filter_datum(fields: List[str], redaction: str,
                  message: str, separator: str) -> str:
+    """returns the log message obfuscated
+    """
     pattern = '|'.join([f'{field}=[^\\{separator}]*' for field in fields])
     return re.sub(pattern, lambda m: f"{m.group().split('=')[0]}={redaction}",
                   message)
@@ -26,10 +27,12 @@ class RedactingFormatter(logging.Formatter):
     SEPARATOR = ";"
 
     def __init__(self, fields: List[str]):
+        "init method"
         super(RedactingFormatter, self).__init__(self.FORMAT)
         self.fields = fields
 
     def format(self, record: logging.LogRecord) -> str:
+        "filter values in incoming log records"
         record.msg = filter_datum(self.fields, self.REDACTION,
                                   record.getMessage(), self.SEPARATOR)
         return super(RedactingFormatter, self).format(record)
@@ -81,30 +84,5 @@ def main():
     db.close()
 
 
-def hash_password(password: str) -> bytes:
-    """
-    Hashes a password using bcrypt.
-
-    Args:
-        password (str): The password to hash.
-
-    Returns:
-        bytes: The salted, hashed password.
-    """
-    salt = bcrypt.gensalt()
-    hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
-    return hashed
-
-
-def is_valid(hashed_password: bytes, password: str) -> bool:
-    """
-    Validates whether the provided password matches the hashed password.
-
-    Args:
-        hashed_password (bytes): The hashed password.
-        password (str): The password to validate.
-
-    Returns:
-        bool: True if the password is valid, False otherwise.
-    """
-    return bcrypt.checkpw(password.encode('utf-8'), hashed_password)
+if __name__ == "__main__":
+    main()

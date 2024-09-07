@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"authurization"
 from typing import List, TypeVar
 
 
@@ -25,7 +26,9 @@ class Auth:
         return True
 
     def authorization_header(self, request=None) -> str:
+        "return none "
         return None
 
     def current_user(self, request=None) -> TypeVar('User'):
+        "return none "
         return None

@@ -2,6 +2,13 @@
 """
 Main file
 """
-from auth import _generate_uuid
+from auth import Auth
 
-print(_generate_uuid())
+email = 'bob@bob.com'
+password = 'MyPwdOfBob'
+auth = Auth()
+
+auth.register_user(email, password)
+
+print(auth.create_session(email))  # Expected output: a new UUID
+print(auth.create_session("unknown@email.com"))  # Expected output: None
